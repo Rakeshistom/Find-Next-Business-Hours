@@ -1,0 +1,27 @@
+public without sharing class NextStartDate {
+    @InvocableMethod(label = 'Finds the next date starting from the target date when business hours reopens.' iconName='slds:custom:custom63')
+    
+    public static List<response> calculateNextStartDate(List<Request> requestList) {
+        
+        List<response> finalList = new List<response>();
+        BusinessHours bh = [SELECT Id FROM BusinessHours WHERE IsDefault=true];
+        
+        for (Request req: requestList){  
+            response resp = new response();
+            resp.nextStart=BusinessHours.nextStartDate(bh.id, req.targetDate);
+            finalList.add(resp); 
+        }
+        return finalList;
+    }
+    
+    public class Request{
+        @InvocableVariable(label = 'Target Date' required = true)
+        public Datetime targetDate;
+    }
+    
+    public class Response
+    {
+        @InvocableVariable (label='Next Start')
+        public Datetime nextStart; 
+    }
+}
