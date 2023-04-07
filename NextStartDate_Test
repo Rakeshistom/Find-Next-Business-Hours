@@ -1,0 +1,30 @@
+@isTest
+public class NextStartDate_Test {
+    
+    @isTest
+    static void calculateNextStartDate() {
+        
+        Datetime targetTime = Datetime.newInstance(2023, 4, 8, 1, 6, 8);
+        List< NextStartDate.Request> requests = new List< NextStartDate.Request>();
+        
+        Profile sysAdminpProfile = [select Id, name from profile where Name='System administrator' limit 1];
+        User adminUser = [select Id,Name from user where profileId= :sysAdminpProfile.Id and isactive= True limit 1];
+       
+        System.runAs(adminUser)
+        {
+            NextStartDate.Request request = new NextStartDate.Request();
+            
+            request.targetDate =targetTime;
+            requests.add(request);
+            
+            Test.startTest();
+            
+            List<NextStartDate.response> response = NextStartDate.calculateNextStartDate(requests);
+            Datetime nextStart = response[0].nextStart;
+            
+            Test.stopTest ();
+            
+            Assert.areEqual(DateTime.newInstance(2023, 4, 10, 6, 00, 00), nextStart, 'Matching DateTime'); 
+        }
+    }
+}
